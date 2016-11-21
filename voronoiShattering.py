@@ -62,5 +62,5 @@ selection = cmds.ls(sl=True, transforms=True)
 
 for s in selection:
     # todo: get number of shards from user input
-    surfaceMaterial = surfaceMaterial(sel, 0.5, 0.5, 1)
+    surfaceMaterial = surfaceMaterial(s, 0.5, 0.5, 1)
     voronoiShatter(s, 5)
