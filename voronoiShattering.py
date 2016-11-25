@@ -1,6 +1,20 @@
 import maya.cmds as cmds
 import random
 
+
+
+def checkColission(contactCount):    
+    
+    #object = cmds.ls(sl=True,transforms=True)
+    if contactCount == 10:
+
+        selection = cmds.ls(sl=True, transforms=True)
+
+        for s in selection:
+            # todo: get number of shards from user input
+            surfaceMaterialLocal = surfaceMaterial(s, 0.5, 0.5, 1)
+            voronoiShatter(s, 5, surfaceMaterialLocal)
+
 def surfaceMaterial(obj, R, G, B):
     name = (obj + '_shardMaterial')
     if ( cmds.objExists(name) == 0 ):
@@ -10,7 +24,7 @@ def surfaceMaterial(obj, R, G, B):
         cmds.setAttr((name + '.color'), R, G, B, type = "double3") 
     return name
 
-def voronoiShatter(obj, n):
+def voronoiShatter(obj, n, surfaceMaterialLocal):
     bbPos = cmds.exactWorldBoundingBox(obj)
     
     # random point placement for polycut operation
@@ -29,7 +43,6 @@ def voronoiShatter(obj, n):
     for vFrom in vPoints:
         
         #cmds.refresh()
-         
         tempObj = cmds.duplicate(obj)
         cmds.setAttr(str(tempObj[0]) + '.visibility',1)       
         cmds.parent(tempObj,shardGroup)
@@ -37,6 +50,7 @@ def voronoiShatter(obj, n):
         for vTo in vPoints:
             if vFrom != vTo:
                 aim = [(v1-v2) for (v1,v2) in zip(vFrom,vTo)]
+                
                 vCenter = [(v1 + v2)/2 for (v1,v2) in zip(vTo,vFrom)]
                 planeAngle = cmds.angleBetween( euler = True, v1=[0,0,1], v2=aim )
                                 
@@ -48,19 +62,11 @@ def voronoiShatter(obj, n):
                 newFaces = afterFaces - originalFaces;
                 
                 cutFaces = ('%s.f[ %d ]' % (tempObj[0], (afterFaces + newFaces - 1)))
-                cmds.sets(cutFaces, forceElement = (surfaceMaterial + 'SG'), e=True)
+                cmds.sets(cutFaces, forceElement = (surfaceMaterialLocal + 'SG'), e=True)
                                 
         cmds.xform(tempObj, cp = True)
     
     cmds.xform(shardGroup)
     cmds.undoInfo(state = True)
         
-    # this part is run when the function is run
 
-#cmds.scriptEditorInfo(ch=True)
-selection = cmds.ls(sl=True, transforms=True)
-
-for s in selection:
-    # todo: get number of shards from user input
-    surfaceMaterial = surfaceMaterial(sel, 0.5, 0.5, 1)
-    voronoiShatter(s, 5)
