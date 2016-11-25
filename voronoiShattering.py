@@ -3,7 +3,7 @@ import random
 
 def checkColission(contactCount, pPieces):    
     
-    #object = cmds.ls(sl=True,transforms=True)
+    object = cmds.ls(sl=True,transforms=True)
     if contactCount == 1:
 
         selection = cmds.ls(sl=True, transforms=True)
@@ -12,6 +12,10 @@ def checkColission(contactCount, pPieces):
             # todo: get number of shards from user input
             surfaceMaterialLocal = surfaceMaterial(s, 0.5, 0.5, 1)
             voronoiShatter(s, surfaceMaterialLocal, pPieces)
+        #delete original object
+        cmds.delete()
+
+
 
 def surfaceMaterial(obj, R, G, B):
     name = (obj + '_shardMaterial')
@@ -67,5 +71,3 @@ def voronoiShatter(obj, surfaceMaterialLocal, n):
     cmds.xform(shardGroup)
     cmds.undoInfo(state = True)
 	
-	#delete original object
-	cmds.delete(obj)

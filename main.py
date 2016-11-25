@@ -1,12 +1,11 @@
 import maya.cmds as cmds
 import functools
 import sys
-#path = r'C:\Users\Pelle Serander\Documents\maya\2017\scripts'
-#sys.path.append(path)  
-
+path = r'C:\Users\Pelle Serander\Documents\maya\2017\scripts'
+sys.path.append(path)  
 import voronoiShattering
 
-hasHit = True
+
 
 def createUI(pWindowTitle, pApplyCallback):
     
