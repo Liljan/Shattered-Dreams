@@ -1,15 +1,15 @@
 import maya.cmds as cmds
 import random
 
-def checkColission(contactCount, pPieces, selection):    
+def checkColission(contactCount, pPieces, selection, pShowProgress):    
     
     object = cmds.ls(sl=True,transforms=True)
-    if contactCount == 1:
+    if contactCount > 0:
 
         for s in selection:
             # todo: get number of shards from user input
             surfaceMaterialLocal = surfaceMaterial(s, 0.5, 0.5, 1)
-            voronoiShatter(s, surfaceMaterialLocal, pPieces)
+            voronoiShatter(s, surfaceMaterialLocal, pPieces, pShowProgress)
         #delete original object
         #cmds.delete()
 
@@ -22,7 +22,7 @@ def surfaceMaterial(obj, R, G, B):
         cmds.setAttr((name + '.color'), R, G, B, type = "double3") 
     return name
 
-def voronoiShatter(obj, surfaceMaterialLocal, n):
+def voronoiShatter(obj, surfaceMaterialLocal, n, pShowProgress):
     bbPos = cmds.exactWorldBoundingBox(obj)
     
     # random point placement for polycut operation
@@ -38,9 +38,24 @@ def voronoiShatter(obj, surfaceMaterialLocal, n):
     cmds.undoInfo(state = False)
     cmds.setAttr(str(obj) + '.visibility',0)
     
+    step = 0
+    
+    if pShowProgress:
+        cmds.progressWindow(title = "Voronoi Calculating", progress = 0, isInterruptable = True, maxValue = n)
+     
+    cmds.undoInfo(state = False)
+    
     for vFrom in vPoints:
         
-        #cmds.refresh()
+        if pShowProgress:
+            if cmds.progressWindow(q = True, isCancelled=True): break
+            if cmds.progressWindow(q = True, progress = True) >= n: break
+            step = step + 1
+            
+            cmds.progressWindow(edit=True, progress = step, status=("Shattering step %d of %d completed..." % (step, n)))
+            
+        cmds.refresh()
+        
         tempObj = cmds.duplicate(obj)
         cmds.setAttr(str(tempObj[0]) + '.visibility',1)       
         cmds.parent(tempObj,shardGroup)
@@ -67,3 +82,4 @@ def voronoiShatter(obj, surfaceMaterialLocal, n):
     
     cmds.xform(shardGroup)
     cmds.undoInfo(state = True)
+    cmds.progressWindow(endProgress=1)
