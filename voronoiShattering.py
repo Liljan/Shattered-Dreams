@@ -6,15 +6,12 @@ def checkColission(contactCount, pPieces, selection):
     object = cmds.ls(sl=True,transforms=True)
     if contactCount == 1:
 
-
         for s in selection:
             # todo: get number of shards from user input
             surfaceMaterialLocal = surfaceMaterial(s, 0.5, 0.5, 1)
             voronoiShatter(s, surfaceMaterialLocal, pPieces)
         #delete original object
-        cmds.delete()
-
-
+        #cmds.delete()
 
 def surfaceMaterial(obj, R, G, B):
     name = (obj + '_shardMaterial')
@@ -63,10 +60,10 @@ def voronoiShatter(obj, surfaceMaterialLocal, n):
                 newFaces = afterFaces - originalFaces;
                 
                 cutFaces = ('%s.f[ %d ]' % (tempObj[0], (afterFaces + newFaces - 1)))
-                cmds.sets(cutFaces, forceElement = (surfaceMaterialLocal + 'SG'), e=True)
+				#do not apply our shitty surface material to keep the original material.
+                #cmds.sets(cutFaces, forceElement = (surfaceMaterialLocal + 'SG'), e=True)
                                 
         cmds.xform(tempObj, cp = True)
     
     cmds.xform(shardGroup)
     cmds.undoInfo(state = True)
-    
