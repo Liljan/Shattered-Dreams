@@ -28,7 +28,7 @@ def createUI(pWindowTitle, pApplyCallback):
     cmds.separator( h=10, style='none' )
     
     cmds.separator( h=10, style='none' )
-    progressionBool = cmds.checkBox( label='Show shatter progression' )
+    progressionBool = cmds.checkBox( label='Show shatter progression', value = True )
     cmds.separator( h=10, style='none' )
     
     cmds.separator( h=10, style='out' )
