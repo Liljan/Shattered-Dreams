@@ -1,16 +1,18 @@
 import maya.cmds as cmds
 import random
+import ConnectDynamic
 
-def checkColission(contactCount, pPieces, selection, pShowProgress):    
+def checkColission(contactCount, pPieces, selection, pShowProgress, hasShattered):    
     
     object = cmds.ls(sl=True,transforms=True)
-    if contactCount > 0:
+    if contactCount >= 1:
 
         for s in selection:
             # todo: get number of shards from user input
             surfaceMaterialLocal = surfaceMaterial(s, 0.5, 0.5, 1)
             voronoiShatter(s, surfaceMaterialLocal, pPieces, pShowProgress)
         #delete original object
+        hasShattered[0] = True
         #cmds.delete()
 
 def surfaceMaterial(obj, R, G, B):
@@ -80,7 +82,11 @@ def voronoiShatter(obj, surfaceMaterialLocal, n, pShowProgress):
                     #cmds.sets(cutFaces, forceElement = (surfaceMaterialLocal + 'SG'), e=True)
                                     
             cmds.xform(tempObj, cp = True)
-    
+        
+            
     cmds.xform(shardGroup)
     cmds.undoInfo(state = True)
     cmds.progressWindow(endProgress=1)
+    ConnectDynamic.addNewRigidBodies()   
+
+reload(ConnectDynamic)

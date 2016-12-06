@@ -1,11 +1,16 @@
 import maya.cmds as cmds
 
-srb = cmds.ls('myActiveRigidBody*')
-print str(srb)
-cmds.delete (srb)
-
-selected = cmds.ls(sl = True)
-
-for rb in selected:
-    cmds.connectDynamic(rb,f = 'gravityField1')
+def addNewRigidBodies():
+    srb = cmds.ls('myActiveRigidBody*')
+    cmds.delete (srb)
     
+    selected = cmds.ls("*_chunks_*")
+    
+    array =  cmds.listRelatives(selected)
+    print selected
+    print array
+    
+    for rb in array:
+        print "Lasse"
+        cmds.select(rb)
+        cmds.connectDynamic(rb,f = 'gravityField*')

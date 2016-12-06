@@ -1,14 +1,14 @@
 import maya.cmds as cmds
 import functools
 import voronoiShattering
+import ConnectDynamic
 
 def createUI(pWindowTitle, pApplyCallback):
     
     windowID = "shatterWindowID"
     
     if cmds.window(windowID, exists = True):
-        cmds.deleteUI(windowID)
-        
+        cmds.deleteUI(windowID)     
  
     cmds.window(windowID, title = pWindowTitle, sizeable = True, resizeToFitChildren = True)
     cmds.rowColumnLayout(numberOfColumns = 3, columnOffset = [(1,'right',3)])
@@ -40,7 +40,7 @@ def createUI(pWindowTitle, pApplyCallback):
                                                             startTimeField,
                                                             endTimeField,
                                                             piecesField, progressionBool)) 
-   
+ 
     def cancelCallback( *pArgs ):
         if cmds.window( windowID, exists=True ):
             cmds.deleteUI( windowID )  
@@ -61,15 +61,23 @@ def applyCallback(pStartTimeField, pEndTimeField, pPiecesField, pProgressionBool
     
     cmds.cutKey(obj, time=(startTime,endTime))
     selection = cmds.ls(sl=True, transforms=True)
+    
+    hasShattered = [False]
+    
     for i in range(int(startTime), int(endTime)):
 	    cmds.currentTime( i )
-	    main(pieces, selection, showProgress)
+	    
+	    if hasShattered[0] == False:        
+	        main(pieces, selection, showProgress, hasShattered)
+	    
+    ConnectDynamic.addNewRigidBodies()
 
-def main(pPieces, selection,pShowProgress):
+def main(pPieces, selection,pShowProgress, hasShattered):
 	myRigidBody = "myActiveRigidBody*"
 	contactCount = cmds.getAttr(myRigidBody+".contactCount")
-	voronoiShattering.checkColission(contactCount, pPieces, selection,pShowProgress);
+	voronoiShattering.checkColission(contactCount, pPieces, selection,pShowProgress, hasShattered);
 
 # this is run on start
+
 reload(voronoiShattering)
 createUI("Shattering Tool", applyCallback)
