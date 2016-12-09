@@ -7,10 +7,13 @@ def addNewRigidBodies():
     selected = cmds.ls("*_chunks_*")
     
     array =  cmds.listRelatives(selected)
-    print selected
-    print array
-    
+
     for rb in array:
-        print "Lasse"
         cmds.select(rb)
+        
+     	
+        #cmds.select(rb)
         cmds.connectDynamic(rb,f = 'gravityField*')
+        
+     
+        
