@@ -3,7 +3,6 @@ import functools
 import voronoiShattering
 import ConnectDynamic
 
-
 def createUI(pWindowTitle, pApplyCallback):
 
     windowID = "shatterWindowID"
@@ -65,45 +64,54 @@ def applyCallback(pStartTimeField, pEndTimeField, pPiecesField, pProgressionBool
     objs = cmds.ls(selection=True)
     obj = objs
 
+
     cmds.cutKey(obj, time=(startTime, endTime))
     selection = cmds.ls(sl=True, transforms=True)
-    vel = [[0,0,0]]
-    hasShattered = [False]
-    hasAdded = True;
+    realLength = len(selection)
+
+    vel = [[0,0,0] for x in range(0,len(selection))]
+    hasShattered = [[False] for x in range(0,len(selection))]
+    hasAdded = [True for x in range(0,len(selection))]
+
     for i in range(int(startTime), int(endTime)):
+
         cmds.currentTime(i)
+        id = 0
+        for sl in selection: 
+            if hasShattered[id] == [False]:
+                checkContact(pieces, sl, showProgress, hasShattered,vel,id)
+            
+            if hasShattered[id] == [True] and hasAdded[id] == True:
+                    objects = cmds.ls(sl+"_chunks_"+str(id))
+                    array =  cmds.listRelatives(objects)
+                    print array
+                    for rb in array:
+                        cmds.select(rb)
+                        cmds.setAttr(rb+'.initialVelocityX', vel[id][0][0] )
+                        cmds.setAttr(rb+'.initialVelocityY', vel[id][0][1] )
+                        cmds.setAttr(rb+'.initialVelocityZ', vel[id][0][2] )
+                        #cmds.setAttr(rb+'.forceX', 10 )
+                        #cmds.setAttr(rb+'.forceY',  )
+                        #cmds.setAttr(rb+'.forceZ', 10)
+                        #cmds.setAttr(rb+'.impulseX', 0.1 )
+                        #cmds.setAttr(rb+'.impulseY', 0 )
+                        #cmds.setAttr(rb+'.impulseZ', 1)
+                        cmds.setAttr(rb+'.impulsePositionX', 0)
+                        cmds.setAttr(rb+'.impulsePositionY', 0 )
+                        cmds.setAttr(rb+'.impulsePositionZ', 0)
+                    hasAdded[id] = False
+            
+            id = id+1
+               
+def checkContact(pPieces, selection, pShowProgress, hasShattered,vel,id):
 
-        if hasShattered[0] == False:
-            checkContact(pieces, selection, showProgress, hasShattered,vel)
-        if hasShattered[0] == True and hasAdded == True:
-            objects = cmds.ls("*_chunks_*")
-            array =  cmds.listRelatives(objects)
-            velTemp = [0,0,0]
-            for rb in array:
-                cmds.select(rb)
-                #cmds.select(rb)
-                velTemp = vel[0];
-                print rb
-                cmds.setAttr(rb+'.velocityX', velTemp[0][0] )
-                cmds.setAttr(rb+'.velocityY', velTemp[0][1] )
-                cmds.setAttr(rb+'.velocityZ', velTemp[0][2])
-                #cmds.setAttr(rb+'.forceX', 10 )
-                #cmds.setAttr(rb+'.forceY',  )
-                #cmds.setAttr(rb+'.forceZ', 10)
-                cmds.setAttr(rb+'.impulseX', 0.01 )
-                #cmds.setAttr(rb+'.impulseY', 0 )
-                #cmds.setAttr(rb+'.impulseZ', 1)
-                cmds.setAttr(rb+'.impulsePositionX', 0)
-                cmds.setAttr(rb+'.impulsePositionY', 0 )
-                cmds.setAttr(rb+'.impulsePositionZ', 0)
-            hasAdded = False
-            print 'hasrun'
-
-def checkContact(pPieces, selection, pShowProgress, hasShattered,vel):
-    myRigidBody = "myActiveRigidBody*"
+    myRigidBody = "myActiveRigidBody"+str(id)
     contactCount = cmds.getAttr(myRigidBody+".contactCount")
-    voronoiShattering.checkColission(vel,contactCount, pPieces, selection,pShowProgress, hasShattered)
-    print str(vel[0])
+    #print str(id)+' in checkcontackt '+ str(contactCount)
+    voronoiShattering.checkColission(vel,contactCount, pPieces, selection,pShowProgress, hasShattered,id)
+   
+
+
 
 # this is run on start
 reload(voronoiShattering)

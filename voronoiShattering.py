@@ -1,30 +1,34 @@
 import maya.cmds as cmds
 import random
 import ConnectDynamic
+import warnings
+warnings.filterwarnings("ignore")
 
-def checkColission(vel,contactCount, pPieces, selection, pShowProgress, hasShattered):    
+def checkColission(vel,contactCount, pPieces, selection, pShowProgress, hasShattered,id):    
     
-    object = cmds.ls(sl=True,transforms=True)
-    if hasShattered[0] == False:
-        boolian = True;
-
+    #object = cmds.ls(sl=True,transforms=True)
+    
+    
     if contactCount >= 1:
-
-        for s in selection:
-            # todo: get number of shards from user input
-            surfaceMaterialLocal = surfaceMaterial(s, 0.5, 0.5, 1)
-            voronoiShatter(s, surfaceMaterialLocal, pPieces, pShowProgress)
+        # todo: get number of shards from user input
+        surfaceMaterialLocal = surfaceMaterial(selection, 0.5, 0.5, 1)
+        voronoiShatter(selection, surfaceMaterialLocal, pPieces, pShowProgress,id)
         #delete original object
-        hasShattered[0] = True
-        boolian = False
+        hasShattered[id] = [True]
+        #hasShattered[id] = [[True]]
+    if contactCount == 0:   
+        vel[id] = cmds.getAttr(selection+'.velocity')
+
+
     
-    if contactCount == 0:
-        vel[0] = cmds.getAttr(object[0]+'.velocity')
-
-    #cmds.delete()
-    return vel
 
 
+try:
+    pass
+except Exception, e:
+    raise e
+else:
+    pass
 def surfaceMaterial(obj, R, G, B):
     name = (obj + '_shardMaterial')
     if ( cmds.objExists(name) == 0 ):
@@ -34,7 +38,7 @@ def surfaceMaterial(obj, R, G, B):
         cmds.setAttr((name + '.color'), R, G, B, type = "double3") 
     return name
 
-def voronoiShatter(obj, surfaceMaterialLocal, n, pShowProgress):
+def voronoiShatter(obj, surfaceMaterialLocal, n, pShowProgress,id):
     bbPos = cmds.exactWorldBoundingBox(obj)
     
     # random point placement for polycut operation
@@ -45,7 +49,7 @@ def voronoiShatter(obj, surfaceMaterialLocal, n, pShowProgress):
           
     # create new group for shards
     cmds.setAttr(obj+'.visibility',0)
-    shardGroup = cmds.group( em=True, name = obj + '_chunks_1' )
+    shardGroup = cmds.group( em=True, name = obj + '_chunks_'+str(id) )
     
     cmds.undoInfo(state = False)
     cmds.setAttr(str(obj) + '.visibility',0)
@@ -97,6 +101,6 @@ def voronoiShatter(obj, surfaceMaterialLocal, n, pShowProgress):
     cmds.xform(shardGroup)
     cmds.undoInfo(state = True)
     cmds.progressWindow(endProgress=1)
-    ConnectDynamic.addNewRigidBodies()  
+    ConnectDynamic.addNewRigidBodies(id)  
 
 reload(ConnectDynamic)
