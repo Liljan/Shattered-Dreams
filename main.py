@@ -76,32 +76,33 @@ def applyCallback(pStartTimeField, pEndTimeField, pPiecesField, pProgressionBool
     for i in range(int(startTime), int(endTime)):
 
         cmds.currentTime(i)
-        id = 0
-        for sl in selection: 
-            if hasShattered[id] == [False]:
-                checkContact(pieces, sl, showProgress, hasShattered,vel,id)
-            
-            if hasShattered[id] == [True] and hasAdded[id] == True:
-                    objects = cmds.ls(sl+"_chunks_"+str(id))
-                    array =  cmds.listRelatives(objects)
-                    print array
-                    for rb in array:
-                        cmds.select(rb)
-                        cmds.setAttr(rb+'.initialVelocityX', vel[id][0][0] )
-                        cmds.setAttr(rb+'.initialVelocityY', vel[id][0][1] )
-                        cmds.setAttr(rb+'.initialVelocityZ', vel[id][0][2] )
-                        #cmds.setAttr(rb+'.forceX', 10 )
-                        #cmds.setAttr(rb+'.forceY',  )
-                        #cmds.setAttr(rb+'.forceZ', 10)
-                        #cmds.setAttr(rb+'.impulseX', 0.1 )
-                        #cmds.setAttr(rb+'.impulseY', 0 )
-                        #cmds.setAttr(rb+'.impulseZ', 1)
-                        cmds.setAttr(rb+'.impulsePositionX', 0)
-                        cmds.setAttr(rb+'.impulsePositionY', 0 )
-                        cmds.setAttr(rb+'.impulsePositionZ', 0)
-                    hasAdded[id] = False
-            
-            id = id+1
+        for sl in selection:
+            count = 0
+
+            id = getId(sl,count,realLength)
+            if( id != -1): 
+                if hasShattered[id] == [False]:
+                    checkContact(pieces, sl, showProgress, hasShattered,vel,id)
+                
+                if hasShattered[id] == [True] and hasAdded[id] == True:
+                        objects = cmds.ls(sl+"_chunks_"+str(id))
+                        array =  cmds.listRelatives(objects)
+                        for rb in array:
+                            cmds.select(rb)
+                            cmds.setAttr(rb+'.initialVelocityX', 0.3*vel[id][0][0] )
+                            cmds.setAttr(rb+'.initialVelocityY', 0.3*vel[id][0][1] )
+                            cmds.setAttr(rb+'.initialVelocityZ', 0.3*vel[id][0][2] )
+                            #cmds.setAttr(rb+'.forceX', 10 )
+                            #cmds.setAttr(rb+'.forceY',  )
+                            #cmds.setAttr(rb+'.forceZ', 10)
+                            #cmds.setAttr(rb+'.impulseX', 0.1 )
+                            #cmds.setAttr(rb+'.impulseY', 0 )
+                            #cmds.setAttr(rb+'.impulseZ', 1)
+                            cmds.setAttr(rb+'.impulsePositionX', 0)
+                            cmds.setAttr(rb+'.impulsePositionY', 0 )
+                            cmds.setAttr(rb+'.impulsePositionZ', 0)
+                        hasAdded[id] = False     
+            count = count+1
                
 def checkContact(pPieces, selection, pShowProgress, hasShattered,vel,id):
 
@@ -111,7 +112,38 @@ def checkContact(pPieces, selection, pShowProgress, hasShattered,vel,id):
     voronoiShattering.checkColission(vel,contactCount, pPieces, selection,pShowProgress, hasShattered,id)
    
 
+def getId(sl,count,length):
+    thisObjShapes = cmds.listRelatives(sl)
+    thisRigidBodyName = 'myActiveRigidBody'
+    temp = ''
+    for shapes in thisObjShapes:
+        if str(thisRigidBodyName) in str(shapes):
+            temp = str(shapes)
+    
+        
+    if length < 11:
+        length = 1
+    elif length < 101:
+        length = 2
+    elif length < 1001:
+        length = 3
+    if temp is not '':
+        id = temp[-length:]
 
+        while is_number(str(id)) == False:
+            length = length-1 
+            id = str[-length:]
+
+        return int(id)
+    else:
+        return -1;
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 # this is run on start
 reload(voronoiShattering)

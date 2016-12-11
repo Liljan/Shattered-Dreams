@@ -7,8 +7,6 @@ warnings.filterwarnings("ignore")
 def checkColission(vel,contactCount, pPieces, selection, pShowProgress, hasShattered,id):    
     
     #object = cmds.ls(sl=True,transforms=True)
-    
-    
     if contactCount >= 1:
         # todo: get number of shards from user input
         surfaceMaterialLocal = surfaceMaterial(selection, 0.5, 0.5, 1)
@@ -19,24 +17,6 @@ def checkColission(vel,contactCount, pPieces, selection, pShowProgress, hasShatt
     if contactCount == 0:   
         vel[id] = cmds.getAttr(selection+'.velocity')
 
-
-    
-
-
-try:
-    pass
-except Exception, e:
-    raise e
-else:
-    pass
-def surfaceMaterial(obj, R, G, B):
-    name = (obj + '_shardMaterial')
-    if ( cmds.objExists(name) == 0 ):
-        cmds.shadingNode( 'lambert', asShader = True, name = name )
-        cmds.sets( renderable = True, noSurfaceShader = True, empty = True, name = (name + 'SG'))
-        cmds.connectAttr( (name + '.outColor'), (name + 'SG.surfaceShader'), force = True)
-        cmds.setAttr((name + '.color'), R, G, B, type = "double3") 
-    return name
 
 def voronoiShatter(obj, surfaceMaterialLocal, n, pShowProgress,id):
     bbPos = cmds.exactWorldBoundingBox(obj)
