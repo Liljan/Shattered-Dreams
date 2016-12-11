@@ -29,15 +29,4 @@ def test_if_inside_mesh(point, obj):
             None, None,
             None
         ) 
-    return farray.length()%2 == 1   
-
-#test
-#cmd.polyTorus()
-
-obj = cmds.ls(sl = True)
-c = cmds.listRelatives(obj, shapes = True, type='surfaceShape' )
-print c[0]
-
-p = (0,0,0)
-
-print test_if_inside_mesh(p,c[0])
+    return farray.length()%2 == 1
