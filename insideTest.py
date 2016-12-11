@@ -29,4 +29,8 @@ def test_if_inside_mesh(point, obj):
             None, None,
             None
         ) 
+<<<<<<< HEAD
     return farray.length()%2 == 1   
+=======
+    return farray.length()%2 == 1
+>>>>>>> bbafde0c2e3dc21e577a31e548847e11e1a11997
