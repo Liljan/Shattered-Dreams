@@ -1,8 +1,9 @@
 import maya.cmds as cmds
 import random
 import ConnectDynamic
-import warnings
-warnings.filterwarnings("ignore")
+import insideTest
+
+
 
 def checkColission(vel,contactCount, pPieces, selection, pShowProgress, hasShattered,id):    
     
@@ -19,13 +20,11 @@ def checkColission(vel,contactCount, pPieces, selection, pShowProgress, hasShatt
 
 
 def voronoiShatter(obj, surfaceMaterialLocal, n, pShowProgress,id):
-    bbPos = cmds.exactWorldBoundingBox(obj)
     
     # random point placement for polycut operation
-    cutX = [random.uniform(bbPos[0] , bbPos[3]) for i in range(n)]
-    cutY = [random.uniform(bbPos[1] , bbPos[4]) for i in range(n)]
-    cutZ = [random.uniform(bbPos[2] , bbPos[5]) for i in range(n)]
-    vPoints = zip(cutX,cutY,cutZ)  
+
+
+    vPoints = getVoronoiPoints(obj,n) 
           
     # create new group for shards
     cmds.setAttr(obj+'.visibility',0)
@@ -82,5 +81,22 @@ def voronoiShatter(obj, surfaceMaterialLocal, n, pShowProgress,id):
     cmds.undoInfo(state = True)
     cmds.progressWindow(endProgress=1)
     ConnectDynamic.addNewRigidBodies(id)  
+
+def getVoronoiPoints(obj,n):
+    bbPos = cmds.exactWorldBoundingBox(obj)
+    c = cmds.listRelatives(obj, shapes = True, type='surfaceShape' )
+    tempVec = []
+    for i in range(n):    
+        cutX = random.uniform(bbPos[0] , bbPos[3])
+        cutY = random.uniform(bbPos[1] , bbPos[4])
+        cutZ = random.uniform(bbPos[2] , bbPos[5])
+
+        while( insideTest.test_if_inside_mesh( (cutX,cutY,cutZ) , c[0] ) == False ):
+            cutX = random.uniform(bbPos[0] , bbPos[3])
+            cutY = random.uniform(bbPos[1] , bbPos[4])
+            cutZ = random.uniform(bbPos[2] , bbPos[5])
+        
+        tempVec.append( [cutX,cutY,cutZ] )
+    return tempVec
 
 reload(ConnectDynamic)
