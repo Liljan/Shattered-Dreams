@@ -10,8 +10,8 @@ def checkColission(vel,contactCount, pPieces, selection, pShowProgress, hasShatt
     #object = cmds.ls(sl=True,transforms=True)
     if contactCount >= 1:
         # todo: get number of shards from user input
-        surfaceMaterialLocal = surfaceMaterial(selection, 0.5, 0.5, 1)
-        voronoiShatter(selection, surfaceMaterialLocal, pPieces, pShowProgress,id)
+        #surfaceMaterialLocal = surfaceMaterial(selection, 0.5, 0.5, 1)
+        voronoiShatter(selection, pPieces, pShowProgress,id)
         #delete original object
         hasShattered[id] = [True]
         #hasShattered[id] = [[True]]
@@ -19,7 +19,7 @@ def checkColission(vel,contactCount, pPieces, selection, pShowProgress, hasShatt
         vel[id] = cmds.getAttr(selection+'.velocity')
 
 
-def voronoiShatter(obj, surfaceMaterialLocal, n, pShowProgress,id):
+def voronoiShatter(obj, n, pShowProgress,id):
     
     # random point placement for polycut operation
 
