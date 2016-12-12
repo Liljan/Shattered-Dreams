@@ -29,7 +29,11 @@ def createUI(pWindowTitle, pApplyCallback):
     cmds.text(label="Shatter pieces:")
     piecesField = cmds.intField(minValue=0, maxValue=100)
     cmds.separator(h=10, style='none')
-
+    
+    cmds.text(label="velocity slider [0,2]")
+    velSlider = cmds.floatSlider( min=0, max=2, value=0.5, step=0.01 )
+    cmds.separator(h=10, style='none')
+    
     cmds.separator(h=10, style='none')
     progressionBool = cmds.checkBox(
         label='Show shatter progression', value=True)
@@ -43,7 +47,9 @@ def createUI(pWindowTitle, pApplyCallback):
     cmds.button(label="Apply", command=functools.partial(pApplyCallback,
                                                             startTimeField,
                                                             endTimeField,
-                                                            piecesField, progressionBool))
+                                                            piecesField, 
+                                                            progressionBool,
+                                                            velSlider))
 
     def cancelCallback(*pArgs):
         if cmds.window(windowID, exists=True):
@@ -54,10 +60,12 @@ def createUI(pWindowTitle, pApplyCallback):
     cmds.showWindow()
 
 
-def applyCallback(pStartTimeField, pEndTimeField, pPiecesField, pProgressionBool, *pArgs):
+def applyCallback(pStartTimeField, pEndTimeField, pPiecesField, pProgressionBool, pVelSlider, *pArgs):
     pieces = cmds.intField(pPiecesField, query=True, value=True)
     startTime = cmds.intField(pStartTimeField, query=True, value=True)
     endTime = cmds.intField(pEndTimeField, query=True, value=True)
+    sliderValue = cmds.floatSlider(pVelSlider, query=True, value=True)
+    print sliderValue
 
     showProgress = cmds.checkBox(pProgressionBool, query=True, value=True)
 
@@ -89,9 +97,9 @@ def applyCallback(pStartTimeField, pEndTimeField, pPiecesField, pProgressionBool
                         array =  cmds.listRelatives(objects)
                         for rb in array:
                             cmds.select(rb)
-                            cmds.setAttr(rb+'.initialVelocityX', 0.3*vel[id][0][0] )
-                            cmds.setAttr(rb+'.initialVelocityY', 0.3*vel[id][0][1] )
-                            cmds.setAttr(rb+'.initialVelocityZ', 0.3*vel[id][0][2] )
+                            cmds.setAttr(rb+'.initialVelocityX', sliderValue*vel[id][0][0] )
+                            cmds.setAttr(rb+'.initialVelocityY', sliderValue*vel[id][0][1] )
+                            cmds.setAttr(rb+'.initialVelocityZ', sliderValue*vel[id][0][2] )
                             #cmds.setAttr(rb+'.forceX', 10 )
                             #cmds.setAttr(rb+'.forceY',  )
                             #cmds.setAttr(rb+'.forceZ', 10)
