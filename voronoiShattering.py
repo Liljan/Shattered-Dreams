@@ -62,17 +62,9 @@ def voronoiShatter(obj, n, pShowProgress,id):
                     
                     vCenter = [(v1 + v2)/2 for (v1,v2) in zip(vTo,vFrom)]
                     planeAngle = cmds.angleBetween( euler = True, v1=[0,0,1], v2=aim )
-                                    
+                    
                     cmds.polyCut(tempObj[0], df = True, cutPlaneCenter = vCenter, cutPlaneRotate = planeAngle)
-                    
-                    originalFaces = cmds.polyEvaluate(tempObj[0], face = True)
                     cmds.polyCloseBorder(tempObj[0], ch = False)
-                    afterFaces = cmds.polyEvaluate(tempObj[0], face = True)
-                    newFaces = afterFaces - originalFaces;
-                    
-                    cutFaces = ('%s.f[ %d ]' % (tempObj[0], (afterFaces + newFaces - 1)))
-    				#do not apply our shitty surface material to keep the original material.
-                    #cmds.sets(cutFaces, forceElement = (surfaceMaterialLocal + 'SG'), e=True)
                                     
             cmds.xform(tempObj, cp = True)
         
